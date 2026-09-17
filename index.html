@@ -235,7 +235,9 @@ function isUnlocked(gi,bi,ui){ if(ui===0) return true; return getStars(gi,bi,ui-
 function gradeStars(gi){ let s=0; DATA.grades[gi].books.forEach((b,bi)=>b.u.forEach((u,ui)=>s+=getStars(gi,bi,ui))); return s; }
 function totalStars(){ let s=0; DATA.grades.forEach((g,gi)=>g.books.forEach((b,bi)=>b.u.forEach((u,ui)=>s+=getStars(gi,bi,ui)))); return s; }
 
-/* ===================== TTS 引擎 ===================== */
+/* ===================== TTS 引擎（混合：原生 TTS + 有道音频兜底） ===================== */
+// 微信内置浏览器（X5/腾讯浏览服务内核）基本不支持 Web Speech API，统一走真实音频
+const isWeChat = /micromessenger/i.test(navigator.userAgent);
 let voiceReady=false;
 function pickVoice(){
   if(!('speechSynthesis' in window)) return null;
@@ -245,15 +247,42 @@ function pickVoice(){
 if('speechSynthesis' in window){
   speechSynthesis.onvoiceschanged=()=>{voiceReady=true;};
 }
+
+/* —— 音频兜底：有道词典 TTS 返回 MP3，微信内可正常播放 —— */
+const ttsAudio=new Audio(); ttsAudio.preload='none';
+let audioQueue=[], audioBusy=false;
+function youdaoURL(w){ return 'https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(w)+'&type=2'; }
+function flushAudio(){
+  if(audioBusy) return;
+  const url=audioQueue.shift();
+  if(!url){ audioBusy=false; return; }
+  audioBusy=true; ttsAudio.src=url;
+  const p=ttsAudio.play(); if(p&&p.catch) p.catch(()=>{ audioBusy=false; flushAudio(); });
+}
+ttsAudio.onended=()=>{ audioBusy=false; flushAudio(); };
+ttsAudio.onerror=()=>{ audioBusy=false; flushAudio(); };
+function speakAudio(text){
+  audioQueue=[];
+  // 有道单词接口对长句/标点会报错，按词拆分逐词朗读
+  String(text).split(/\s+/).filter(Boolean).forEach(tok=>{
+    const w=tok.replace(/[^A-Za-z'-]/g,''); if(w) audioQueue.push(youdaoURL(w));
+  });
+  audioBusy=false; flushAudio();
+}
+
 function speak(text, lang){
-  if(!settings.tts || !('speechSynthesis' in window) || !text) return;
-  try{
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    u.lang=lang||'en-US'; u.rate=settings.rate; u.pitch=1;
-    const v=pickVoice(); if(v) u.voice=v;
-    speechSynthesis.speak(u);
-  }catch(e){}
+  if(!settings.tts || !text) return;
+  if(!isWeChat && ('speechSynthesis' in window)){
+    try{
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(text);
+      u.lang=lang||'en-US'; u.rate=settings.rate; u.pitch=1;
+      const v=pickVoice(); if(v) u.voice=v;
+      speechSynthesis.speak(u);
+      return;
+    }catch(e){ /* 原生失败则落到音频兜底 */ }
+  }
+  speakAudio(text);
 }
 
 /* ===================== 工具 ===================== */
