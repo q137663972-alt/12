@@ -88,9 +88,9 @@ python3 -m http.server 8000
 | 年级 | 上册 | 下册 |
 |---|---|---|
 | 一 | School 学校 / Face 身体 / Animals 动物 / Numbers 数字 / Colours 颜色 / Fruit 水果 | Classroom 教室 / Room 房间 / Toys 玩具 / Food 食物 / Drink 饮品 / Clothes 衣物 |
-| 二 | My Family 家庭 / Boys and Girls / My Friends 朋友 / In the Community / In the Park 公园 / Happy Holidays | Play Sports 运动 / Weather 天气 / Season 季节 / Numbers 11-50 / Daily Routine / Days of the Week |
-| 三 | Myself 我自己 / My Body 身体 / Food 食物 / Pets 宠物 / Clothes 衣服 / Birthdays 生日 | School Subjects / My School 学校 / After School / My Family 家庭 / Family Activities / My Home 家 |
-| 四 | Sports and Games / On the Weekend / Transportation / Asking for Help / Safety 安全 / Jobs 职业 | My Neighbourhood / Cities 城市 / Travel Plans / Hobbies 爱好 / Free Time 空闲 / Countries 国家 |
+| 二 | My Family 家庭 / Boys and Girls 男孩女孩 / My Friends 朋友 / In the Community 在社区 / In the Park 公园 / Happy Holidays 快乐的节日 | Play Sports 运动 / Weather 天气 / Season 季节 / Numbers 11-50 数字 11-50 / Daily Routine 日常作息 / Days of the Week 一周七天 |
+| 三 | Myself 我自己 / My Body 身体 / Food 食物 / Pets 宠物 / Clothes 衣服 / Birthdays 生日 | School Subjects 学校课程 / My School 学校 / After School 放学后 / My Family 家庭 / Family Activities 家庭活动 / My Home 家 |
+| 四 | Sports and Games 运动和游戏 / On the Weekend 在周末 / Transportation 交通方式 / Asking for Help 寻求帮助 / Safety 安全 / Jobs 职业 | My Neighbourhood 我的社区 / Cities 城市 / Travel Plans 旅行计划 / Hobbies 爱好 / Free Time 空闲 / Countries 国家 |
 | 五 | Classmates 同学 / Teachers 老师 / Animals 动物 / Shopping Day 购物日 / TV Shows 电视节目 / Chores 家务 | Keeping Healthy 保持健康 / Special Days 特殊的日子 / Making Contact 取得联系 / Last Weekend 上周末 / Have a Great Trip 旅途愉快 / Growing Up 成长 |
 | 六 | In China 在中国 / Around the World 世界各地 / Animal World 动物世界 / Feelings 情绪 / Famous People 名人 / Winter Vacation 寒假 | Visiting Canada 访问加拿大 / All Around Me 我周围的一切 / Daily Life 日常生活 / Free Time 空闲时间 / Nature and Culture 自然与文化 / Summer Vacation 暑假 |
 
