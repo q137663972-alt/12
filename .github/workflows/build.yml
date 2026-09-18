@@ -45,9 +45,27 @@ jobs:
           unzip -q gradle-8.2-bin.zip -d "$HOME/gradle_dist"
           echo "$HOME/gradle_dist/gradle-8.2/bin" >> "$GITHUB_PATH"
 
+      - name: Diagnostics (env / SDK / gradle)
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          java -version 2>&1
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "--- platforms:"; ls "$ANDROID_HOME/platforms" 2>&1
+          echo "--- build-tools:"; ls "$ANDROID_HOME/build-tools" 2>&1
+          echo "--- gradle:"; gradle -v 2>&1 | head -12
+
       - name: Build debug APK (auto-signed, installable)
         working-directory: ${{ matrix.project }}
-        run: gradle assembleDebug --no-daemon
+        run: |
+          set -o pipefail
+          gradle assembleDebug --no-daemon 2>&1 | tee "$GITHUB_WORKSPACE/build.log"
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}-buildlog
+          path: build.log
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
