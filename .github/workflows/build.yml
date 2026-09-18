@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 失败时把构建日志提交回仓库，便于诊断
     strategy:
       fail-fast: false
       matrix:
@@ -59,6 +61,23 @@ jobs:
         run: |
           set -o pipefail
           gradle assembleDebug --no-daemon 2>&1 | tee "$GITHUB_WORKSPACE/build.log"
+
+      - name: Commit build log back to repo (diagnostics)
+        if: failure()
+        run: |
+          mkdir -p ci-logs
+          cp "$GITHUB_WORKSPACE/build.log" "ci-logs/${{ matrix.project }}.log"
+          cd ci-logs && echo "--- env ---" > "${{ matrix.project }}.env.txt"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "${{ matrix.project }}.env.txt"
+          ls "$ANDROID_HOME/platforms" >> "${{ matrix.project }}.env.txt" 2>&1
+          ls "$ANDROID_HOME/build-tools" >> "${{ matrix.project }}.env.txt" 2>&1
+          which gradle >> "${{ matrix.project }}.env.txt" 2>&1
+          cd "$GITHUB_WORKSPACE"
+          git config user.name "ci-bot"
+          git config user.email "ci-bot@users.noreply.github.com"
+          git add ci-logs
+          git commit -m "ci: build log for diagnostics (${{ matrix.project }})" || exit 0
+          git push origin HEAD:main
 
       - name: Upload build log on failure
         if: failure()
