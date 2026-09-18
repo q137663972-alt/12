@@ -95,3 +95,44 @@ python3 -m http.server 8000
 | 六 | In China 在中国 / Around the World 世界各地 / Animal World 动物世界 / Feelings 情绪 / Famous People 名人 / Winter Vacation 寒假 | Visiting Canada 访问加拿大 / All Around Me 我周围的一切 / Daily Life 日常生活 / Free Time 空闲时间 / Nature and Culture 自然与文化 / Summer Vacation 暑假 |
 
 想增改内容，直接编辑对应 `js/data-gN.js`，无需改动玩法代码。
+
+## 📺 安卓电视 / 机顶盒版（APK）
+
+英语乐园可以打包成安卓安装包，装到电视机或机顶盒上用**遥控器**玩。
+
+工程位于 `android-app/`，是一个原生 `WebView` 壳：把本 H5 整体包进 `assets/`，加载 `index.html#tv` 即自动进入「遥控器模式」。兼容普通安卓机顶盒与 Android TV（首页横幅入口）。
+
+### 适配做了什么
+- **遥控器方向键（D-pad）导航**：自动给所有可点元素打焦点，方向键在卡片/选项间按几何最近邻移动，确认键（OK/Enter）选中并触发点击。
+- **横屏大屏布局**：放宽页面宽度、放大字号、网格多列。电视端（`body.tv`）额外做了**比手机更醒目**的样式——焦点光晕加粗放大、开关放大到 92×50 并带「开/关」文字与强描边、图标与 emoji 再放大，沙发远距离也看得清。
+- **发音**：电视盒子常无系统语音包，自动强制走有道 MP3（需联网）。
+- **跟读（麦克风）**：带麦遥控器（如部分 Android TV / 机顶盒语音遥控）通过原生 `SpeechRecognizer` 桥接实现**真跟读打分**，首次使用会请求录音权限；无麦克风或拒绝授权的设备自动隐藏麦克风按钮、改为「✅ 我读啦，过关」兜底，不会卡关。
+
+> 手机 / 桌面浏览器打开**完全不受影响**——TV 适配仅在 `#tv` 模式或电视/盒子 UA 下启用。
+
+### 本机构建 APK
+需要：Android Studio（或 Android SDK + Gradle）、一台能联网下载依赖的电脑。
+
+**方式一（推荐）**：用 Android Studio 打开 `android-app/` 目录 → 菜单 **Build → Generate Signed Bundle / APK** → 选 **APK** → 生成签名（或先用默认 debug key）→ 构建完成后产物在 `android-app/app/build/outputs/apk/release/app-release.apk`（或 `debug/` 目录）。
+
+**方式二（命令行）**：
+```bash
+cd android-app
+./gradlew assembleRelease   # 首次会自动补齐 gradle wrapper
+```
+
+> ⚠️ 本沙箱到 Google 下载源（Android SDK / Gradle 依赖）被网络拦截，无法在此直接编译出 APK；工程已完整给出，请在能联网装 SDK 的机器上出包。
+
+### 安装到电视 / 机顶盒
+- **ADB（推荐）**：电视需开启「开发者选项 → 网络调试 / USB 调试」，与电脑同一局域网：
+  ```bash
+  adb connect <电视IP>:5555
+  adb install app-release.apk
+  ```
+- 或把 APK 拷到 U 盘，在电视文件管理器里点击安装。
+- 普通安卓机顶盒直接安装即可；Android TV 会在首页以横幅（banner）形式显示入口。
+
+### 已知限制
+- 发音需联网（有道 MP3）；离线环境点读无声音。
+- 跟读真识别依赖系统语音服务（Google 语音识别）。部分无麦或没装语音服务的盒子会自动回落「我读啦」手动兜底；首次使用会弹录音授权。
+- 建议横屏使用；老旧盒子若 WebView 版本过旧，可在应用商店升级「Android System WebView」。
