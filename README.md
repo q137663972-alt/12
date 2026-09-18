@@ -132,6 +132,14 @@ cd android-app
 
 产物为 debug 签名 APK，开启「未知来源」即可直接安装。
 
+**更省事的下载方式**：构建成功后会自动发布到 Release **`apk-latest`**（免登录、免解压，手机点开即下）：
+
+- Release 页面：https://github.com/q137663972-alt/12/releases/tag/apk-latest
+- 电视版直链：`.../releases/download/apk-latest/EnglishPlayground-TV.apk`
+- 手机版直链：`.../releases/download/apk-latest/EnglishPlayground-Phone.apk`
+
+> 每次推送都会自动更新这个 Release，链接固定不变，始终拿到最新构建。
+
 ### 安装到电视 / 机顶盒
 - **ADB（推荐）**：电视需开启「开发者选项 → 网络调试 / USB 调试」，与电脑同一局域网：
   ```bash
