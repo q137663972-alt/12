@@ -1,15 +1,25 @@
-name: Build Android TV APK
+name: Build Android APK (TV + Phone)
 
 on:
   push:
     paths:
       - 'android-app/**'
+      - 'android-phone/**'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: android-app
+            artifact: EnglishPlaygroundTV-apk
+          - project: android-phone
+            artifact: EnglishPlaygroundPhone-apk
+    name: Build ${{ matrix.project }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,12 +45,12 @@ jobs:
           unzip -q gradle-8.2-bin.zip -d "$HOME/gradle_dist"
           echo "$HOME/gradle_dist/gradle-8.2/bin" >> "$GITHUB_PATH"
 
-      - name: Build debug APK (auto-signed, installable on TV)
-        working-directory: android-app
+      - name: Build debug APK (auto-signed, installable)
+        working-directory: ${{ matrix.project }}
         run: gradle assembleDebug --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: EnglishPlaygroundTV-apk
-          path: android-app/app/build/outputs/apk/debug/*.apk
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.project }}/app/build/outputs/apk/debug/*.apk

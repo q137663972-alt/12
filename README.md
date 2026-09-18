@@ -121,7 +121,16 @@ cd android-app
 ./gradlew assembleRelease   # 首次会自动补齐 gradle wrapper
 ```
 
-> ⚠️ 本沙箱到 Google 下载源（Android SDK / Gradle 依赖）被网络拦截，无法在此直接编译出 APK；工程已完整给出，请在能联网装 SDK 的机器上出包。
+> ⚠️ 本沙箱到 Google 下载源（Android SDK / Gradle 依赖）被网络拦截，无法在此直接编译出 APK；请用下面的方式三（GitHub Actions）或在本机出包。
+
+**方式三（推荐，免本地环境）**：仓库已内置 `.github/workflows/build.yml`。推送后 GitHub 海外服务器会自动构建；也可在仓库 **Actions → Build Android APK (TV + Phone) → Run workflow** 手动触发。约 5–10 分钟后，在页面底部 **Artifacts** 下载：
+
+| 产物名 | 对应工程 | 适用设备 |
+|---|---|---|
+| `EnglishPlaygroundTV-apk` | `android-app/` | 电视 / 机顶盒（遥控器模式） |
+| `EnglishPlaygroundPhone-apk` | `android-phone/` | 安卓手机（原版 H5 样式） |
+
+产物为 debug 签名 APK，开启「未知来源」即可直接安装。
 
 ### 安装到电视 / 机顶盒
 - **ADB（推荐）**：电视需开启「开发者选项 → 网络调试 / USB 调试」，与电脑同一局域网：
@@ -136,3 +145,27 @@ cd android-app
 - 发音需联网（有道 MP3）；离线环境点读无声音。
 - 跟读真识别依赖系统语音服务（Google 语音识别）。部分无麦或没装语音服务的盒子会自动回落「我读啦」手动兜底；首次使用会弹录音授权。
 - 建议横屏使用；老旧盒子若 WebView 版本过旧，可在应用商店升级「Android System WebView」。
+
+## 📱 安卓手机版（APK）
+
+给手机用的安装包，**界面完全沿用原版 H5 的移动端样式**（不是电视大屏那套）。
+
+工程位于 `android-phone/`，与电视版的差别只有"壳"部分，H5 内容共用同一份：
+
+| 项目 | 电视版 `android-app/` | 手机版 `android-phone/` |
+|---|---|---|
+| 加载地址 | `index.html#tv`（遥控器模式） | `index.html`（原版手机样式） |
+| 屏幕方向 | 横屏 landscape | 竖屏 portrait |
+| 桌面入口 | `LAUNCHER` + `LEANBACK_LAUNCHER` | 仅 `LAUNCHER`（不出现在电视桌面） |
+| TV 横幅 | 有 banner | 无 |
+| 触摸屏 | `required=false` | `required=true` |
+| 包名 | `com.example.englishplayground` | `com.example.englishplayground.phone` |
+
+> 包名不同，所以**电视版和手机版可以同时装在一台设备上，互不覆盖**。
+
+手机版同样带**原生 `SpeechRecognizer` 麦克风桥接**，跟读游戏可以真读真打分（首次使用弹录音授权，拒绝则回落「✅ 我读啦，过关」）。
+
+### 构建与安装
+与电视版完全相同，三选一：Android Studio 打开 `android-phone/`、命令行 `./gradlew assembleDebug`、或用仓库内置的 **GitHub Actions**（下载 `EnglishPlaygroundPhone-apk` 产物）。
+
+装到手机：把 APK 传到手机（微信/QQ/数据线均可）→ 点击安装 → 允许「未知来源」→ 打开即可，使用体验与浏览器里打开 H5 一致。
