@@ -2,6 +2,14 @@
 
 一个面向小学生的英语学习小游戏，基于**人教版新起点（一年级起点）1–6 年级**全 12 册 **72 单元**内容（883 个单词 + 168 个句型），手机浏览器打开即用，无需安装、无需联网服务器。
 
+## 🔒 私密性说明
+
+仓库为公开仓库，但**APK 安装包不对外提供公开下载**：
+
+- 工作流只负责构建，APK 仅作为 **Actions 产物**存在，下载需登录 GitHub（非免登录公开链接）。
+- 需要安装包请直接向作者索取（或从 Actions 产物自行下载）。
+- GitHub Pages 在线版保持可用（仓库为公开状态）。
+
 ## 🌐 在线体验
 
 **https://q137663972-alt.github.io/12/**
@@ -132,13 +140,7 @@ cd android-app
 
 产物为 debug 签名 APK，开启「未知来源」即可直接安装。
 
-**更省事的下载方式**：构建成功后会自动发布到 Release **`apk-latest`**（免登录、免解压，手机点开即下）：
-
-- Release 页面：https://github.com/q137663972-alt/12/releases/tag/apk-latest
-- 电视版直链：`.../releases/download/apk-latest/EnglishPlayground-TV.apk`
-- 手机版直链：`.../releases/download/apk-latest/EnglishPlayground-Phone.apk`
-
-> 每次推送都会自动更新这个 Release，链接固定不变，始终拿到最新构建。
+> 需要登录 GitHub 才能下载产物，安装包不对外公开提供直链下载。
 
 ### 安装到电视 / 机顶盒
 - **ADB（推荐）**：电视需开启「开发者选项 → 网络调试 / USB 调试」，与电脑同一局域网：
