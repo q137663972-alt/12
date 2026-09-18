@@ -54,3 +54,46 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.project }}/app/build/outputs/apk/debug/*.apk
+
+  # 把两个 APK 发布到固定 Release（apk-latest），生成免登录、免解压的公开直链
+  release:
+    name: Publish APKs to Release
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Download built APKs
+        uses: actions/download-artifact@v4
+        with:
+          path: apks
+          pattern: EnglishPlayground*-apk
+
+      - name: Rename APKs
+        run: |
+          mkdir -p dist
+          cp apks/EnglishPlaygroundTV-apk/app-debug.apk    dist/EnglishPlayground-TV.apk
+          cp apks/EnglishPlaygroundPhone-apk/app-debug.apk dist/EnglishPlayground-Phone.apk
+          ls -la dist
+
+      - name: Publish to Release (apk-latest)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: 英语乐园 APK · 自动构建 #${{ github.run_number }}
+          body: |
+            每次推送自动构建，本 Release 始终指向**最新**构建产物。
+
+            - `EnglishPlayground-TV.apk` — 电视 / 机顶盒版（遥控器模式，横屏）
+            - `EnglishPlayground-Phone.apk` — 安卓手机版（原版 H5 竖屏样式）
+
+            两个包 debug 自动签名，安装时需在设备上允许「未知来源」（仅首次）。
+            包名不同（手机版带 `.phone` 后缀），可同时安装。
+
+            来源 commit：${{ github.sha }}
+          files: |
+            dist/EnglishPlayground-TV.apk
+            dist/EnglishPlayground-Phone.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
