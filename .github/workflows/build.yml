@@ -30,14 +30,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # runner 已预装 Android SDK（$ANDROID_HOME 含 API34 / build-tools 34.0.0），
+      # 无需第三方 setup-android（近期不稳定，曾导致构建在 16s 内失败）
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses || true
+        run: 'yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true'
 
       - name: Install SDK platform & build-tools (API 34)
-        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0"'
 
       - name: Download Gradle 8.2 (wrapper jar missing in repo)
         run: |
