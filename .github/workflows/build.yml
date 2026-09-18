@@ -1,0 +1,46 @@
+name: Build Android TV APK
+
+on:
+  push:
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Install SDK platform & build-tools (API 34)
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Download Gradle 8.2 (wrapper jar missing in repo)
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          unzip -q gradle-8.2-bin.zip -d "$HOME/gradle_dist"
+          echo "$HOME/gradle_dist/gradle-8.2/bin" >> "$GITHUB_PATH"
+
+      - name: Build debug APK (auto-signed, installable on TV)
+        working-directory: android-app
+        run: gradle assembleDebug --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EnglishPlaygroundTV-apk
+          path: android-app/app/build/outputs/apk/debug/*.apk
