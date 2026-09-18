@@ -121,7 +121,8 @@ public class MainActivity extends Activity {
     }
 
     private void reportResult(final String text) {
-        final String js = "window.__onNativeSRResult(" + new JSONObject(text == null ? "" : text).toString() + ")";
+        // 用 JSONObject.quote 做 JSON 转义（静态方法，不抛受检异常）
+        final String js = "window.__onNativeSRResult(" + JSONObject.quote(text == null ? "" : text) + ")";
         runOnUiThread(new Runnable() {
             @Override public void run() {
                 try { webView.evaluateJavascript(js, null); } catch (Exception ignored) {}
